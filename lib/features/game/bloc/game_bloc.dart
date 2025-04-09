@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -58,7 +60,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
               isCurrentPlayerTurn: game['current_turn_id'] == userId,
               isPlayer1: isPlayer1,
               lastMove: game['last_move'] != null
-                  ? Map<String, int>.from(game['last_move'])
+                  ? Offset(game['last_move']['column'].toDouble(), game['last_move']['row'].toDouble())
                   : null,
               player1Name: game['player1_name'] ?? 'Player 1',
               player2Name: game['player2_name'] ?? 'Player 2',

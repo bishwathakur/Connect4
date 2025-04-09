@@ -160,6 +160,19 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                       color: AppColors.primary,
                       onPressed: () {
                         bloc.add(FindRandomGameRequested());
+                        //fOR TESTING ui OFR GAME SCREEN PUSH IT
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => BlocProvider(
+                        //       create: (_) => GameBloc(
+                        //         supabase: Supabase.instance.client,
+                        //         userId: Supabase.instance.client.auth.currentUser!.id,
+                        //       )..add(GameStarted('test-game-id')),
+                        //       child: const GameScreen(gameId: 'test-game-id'),
+                        //     ),
+                        //   ),
+                        // );
                       },
                     ),
                     const SizedBox(height: 20),

@@ -17,7 +17,7 @@ class GameActive extends GameState {
   final int turnCount;
   final bool isCurrentPlayerTurn;
   final bool isPlayer1;
-  final Map<String,int>? lastMove;
+  final Offset? lastMove;
   final String player1Name;
   final String player2Name;
   final int player1Score;

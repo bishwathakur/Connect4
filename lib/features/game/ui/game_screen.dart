@@ -502,3 +502,285 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     );
   }
 }
+
+// import 'package:flutter/material.dart';
+// import '../../../core/constants/colors.dart';
+// import '../widgets/connect_four_board.dart';
+// import '../widgets/game_info_panel.dart';
+// import '../widgets/player_avatar.dart';
+//
+// class GameScreen extends StatefulWidget {
+//   const GameScreen({super.key});
+//
+//   @override
+//   State<GameScreen> createState() => _GameScreenState();
+// }
+//
+// class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
+//   late AnimationController _dropAnimationController;
+//   late List<List<int?>> mockBoard;
+//   bool isPlayerTurn = true;
+//   int currentTurn = 1;
+//   int turnCount = 8;
+//   Offset? lastMove;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     _dropAnimationController = AnimationController(
+//       duration: const Duration(milliseconds: 500),
+//       vsync: this,
+//     );
+//     mockBoard = [
+//       [null, null, null, null, null, null, null],
+//       [null, null, null, null, null, null, null],
+//       [null, null, null, 2,    null, null, null],
+//       [null, null, 1,    1,    2,    null, null],
+//       [null, 2,    1,    2,    1,    null, null],
+//       [1,    1,    2,    1,    2,    2,    null],
+//
+//     ];
+//     lastMove = const Offset(3, 4); // Col 3, Row 4
+//   }
+//
+//   @override
+//   void dispose() {
+//     _dropAnimationController.dispose();
+//     super.dispose();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: AppColors.backgroundDark,
+//       appBar: AppBar(
+//         backgroundColor: AppColors.backgroundLight,
+//         elevation: 0,
+//         title: Row(
+//           children: [
+//             Container(
+//               padding: const EdgeInsets.all(4),
+//               decoration: const BoxDecoration(
+//                 color: AppColors.boardBlue,
+//                 shape: BoxShape.circle,
+//               ),
+//               child: const Icon(Icons.grid_4x4, color: Colors.white, size: 20),
+//             ),
+//             const SizedBox(width: 8),
+//             const Text(
+//               'CONNECT 4',
+//               style: TextStyle(
+//                 color: AppColors.primaryText,
+//                 fontWeight: FontWeight.bold,
+//               ),
+//             ),
+//           ],
+//         ),
+//         actions: [
+//           IconButton(
+//             icon: const Icon(Icons.info_outline),
+//             onPressed: () => _showGameRules(context),
+//             color: AppColors.primaryText,
+//           ),
+//         ],
+//       ),
+//       body: Column(
+//         children: [
+//           const SizedBox(height: 16),
+//           GameInfoPanel(
+//             isPlayerTurn: isPlayerTurn,
+//             turnNumber: turnCount,
+//             currentPlayerColor: isPlayerTurn ? AppColors.chipRed : AppColors.chipYellow,
+//           ),
+//           const SizedBox(height: 16),
+//           Padding(
+//             padding: const EdgeInsets.symmetric(horizontal: 20),
+//             child: Row(
+//               children: [
+//                 Expanded(
+//                   child: _buildPlayerInfo(
+//                     name: 'Alice',
+//                     color: AppColors.chipRed,
+//                     isCurrentTurn: currentTurn == 1,
+//                     score: 2,
+//                   ),
+//                 ),
+//                 Container(
+//                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+//                   decoration: BoxDecoration(
+//                     color: AppColors.backgroundLight,
+//                     borderRadius: BorderRadius.circular(20),
+//                   ),
+//                   child: const Text(
+//                     'VS',
+//                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+//                   ),
+//                 ),
+//                 Expanded(
+//                   child: _buildPlayerInfo(
+//                     name: 'Bob',
+//                     color: AppColors.chipYellow,
+//                     isCurrentTurn: currentTurn == 2,
+//                     score: 3,
+//                     alignment: CrossAxisAlignment.end,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//           const SizedBox(height: 20),
+//           Expanded(
+//             child: ConnectFourBoard(
+//               board: mockBoard,
+//               lastMove: const Offset(4,3),
+//               isPlayerTurn: isPlayerTurn,
+//               dropAnimationController: _dropAnimationController,
+//               onColumnTapped: (col) {
+//                 setState(() {
+//                   // Drop a chip in the selected column (first available from bottom)
+//                   for (int row = mockBoard.length - 1; row >= 0; row--) {
+//                     if (mockBoard[row][col] == null) {
+//                       mockBoard[row][col] = currentTurn;
+//                       lastMove = Offset(col.toDouble(), row.toDouble());
+//                       currentTurn = currentTurn == 1 ? 2 : 1;
+//                       isPlayerTurn = !isPlayerTurn;
+//                       turnCount++;
+//                       break;
+//                     }
+//                   }
+//                 });
+//               },
+//
+//             ),
+//           ),
+//           Padding(
+//             padding: const EdgeInsets.all(16.0),
+//             child: Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//               children: [
+//                 _buildControlButton(Icons.chat_bubble_outline, 'Chat', () {}),
+//                 _buildControlButton(Icons.flag_outlined, 'Forfeit', () {}),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+//
+//   Widget _buildPlayerInfo({
+//     required String name,
+//     required Color color,
+//     required bool isCurrentTurn,
+//     required int score,
+//     CrossAxisAlignment alignment = CrossAxisAlignment.start,
+//   }) {
+//     return Container(
+//       padding: const EdgeInsets.all(12),
+//       decoration: BoxDecoration(
+//         color: isCurrentTurn
+//             ? AppColors.backgroundLight
+//             : AppColors.backgroundLight.withOpacity(0.5),
+//         borderRadius: BorderRadius.circular(12),
+//         border: isCurrentTurn ? Border.all(color: color, width: 2) : null,
+//       ),
+//       child: Column(
+//         crossAxisAlignment: alignment,
+//         children: [
+//           Row(
+//             mainAxisAlignment: alignment == CrossAxisAlignment.start
+//                 ? MainAxisAlignment.start
+//                 : MainAxisAlignment.end,
+//             children: [
+//               if (alignment == CrossAxisAlignment.start)
+//                 PlayerAvatar(color: color, size: 24),
+//               const SizedBox(width: 8),
+//               Flexible(
+//                 child: Text(
+//                   name,
+//                   style: const TextStyle(
+//                     color: AppColors.primaryText,
+//                     fontWeight: FontWeight.bold,
+//                     fontSize: 14,
+//                   ),
+//                   overflow: TextOverflow.ellipsis,
+//                 ),
+//               ),
+//               if (alignment == CrossAxisAlignment.end) ...[
+//                 const SizedBox(width: 8),
+//                 PlayerAvatar(color: color, size: 24),
+//               ],
+//             ],
+//           ),
+//           const SizedBox(height: 4),
+//           Row(
+//             mainAxisAlignment: alignment == CrossAxisAlignment.start
+//                 ? MainAxisAlignment.start
+//                 : MainAxisAlignment.end,
+//             children: [
+//               Text(
+//                 isCurrentTurn ? "Your turn" : "Waiting...",
+//                 style: TextStyle(
+//                   color: isCurrentTurn ? color : AppColors.secondaryText,
+//                   fontSize: 12,
+//                 ),
+//               ),
+//               const Spacer(),
+//               if (score > 0)
+//                 Container(
+//                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+//                   decoration: BoxDecoration(
+//                     color: color.withOpacity(0.2),
+//                     borderRadius: BorderRadius.circular(10),
+//                   ),
+//                   child: Text(
+//                     'Wins: $score',
+//                     style: TextStyle(
+//                       color: color,
+//                       fontSize: 10,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                 ),
+//             ],
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+//
+//   Widget _buildControlButton(IconData icon, String label, VoidCallback onPressed) {
+//     return ElevatedButton.icon(
+//       onPressed: onPressed,
+//       icon: Icon(icon, size: 20),
+//       label: Text(label),
+//       style: ElevatedButton.styleFrom(
+//         backgroundColor: AppColors.backgroundLight,
+//         foregroundColor: Colors.white,
+//         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+//         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+//       ),
+//     );
+//   }
+//
+//   void _showGameRules(BuildContext context) {
+//     showDialog(
+//       context: context,
+//       builder: (context) => AlertDialog(
+//         backgroundColor: AppColors.backgroundLight,
+//         title: const Text('How to Play', textAlign: TextAlign.center),
+//         content: const Text(
+//           'Connect 4 chips of your color in a row - horizontally, vertically, or diagonally to win!',
+//           textAlign: TextAlign.center,
+//         ),
+//         actions: [
+//           ElevatedButton(
+//             onPressed: () => Navigator.pop(context),
+//             child: const Text('GOT IT'),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/colors.dart';
 
 class ConnectFourBoard extends StatelessWidget {
-  final List<List<int>> board;
-  final Map<String, int>? lastMove;
+  final List<List<int?>> board;
+  final Offset? lastMove;
   final bool isPlayerTurn;
   final AnimationController dropAnimationController;
   final Function(int) onColumnTapped;
@@ -77,7 +77,7 @@ class ConnectFourBoard extends StatelessWidget {
                 // Game pieces (chips)
                 for (int row = 0; row < rows; row++)
                   for (int col = 0; col < columns; col++)
-                    if (board[row][col] != 0)
+                    if (board[row][col] != null && board[row][col] != 0)
                       _buildChip(
                         row,
                         col,
@@ -85,8 +85,8 @@ class ConnectFourBoard extends StatelessWidget {
                         cellSize,
                         columns,
                         isHighlighted: lastMove != null &&
-                            lastMove!['row'] == row &&
-                            lastMove!['col'] == col,
+                            lastMove!.dy.toInt() == row &&
+                            lastMove!.dx.toInt() == col,
                       ),
               ],
             ),
@@ -118,41 +118,56 @@ class ConnectFourBoard extends StatelessWidget {
   }
 
   Widget _buildCell(BuildContext context, int row, int col, double cellSize) {
-    return Container(
-      margin: const EdgeInsets.all(4),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Cell background
-          Container(
-            width: cellSize - 8,
-            height: cellSize - 8,
-            decoration: BoxDecoration(
-              color: AppColors.boardBlue,
-              shape: BoxShape.circle,
+    final value = board[row][col];
+
+    Color fillColor;
+    if (value == 1) {
+      fillColor = AppColors.chipRed;
+    } else if (value == 2) {
+      fillColor = AppColors.chipYellow;
+    } else {
+      fillColor = AppColors.primaryText; // empty/null = black
+    }
+
+    return GestureDetector(
+      onTap: () => onColumnTapped(col),
+      child: Container(
+        margin: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: AppColors.boardBlue,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 4,
+              offset: const Offset(2, 2),
             ),
-          ),
-          // Cell hole (empty space)
-          Container(
-            width: cellSize - 16,
-            height: cellSize - 16,
+          ],
+        ),
+        child: Center(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: cellSize * 0.6,
+            height: cellSize * 0.6,
             decoration: BoxDecoration(
-              color: AppColors.backgroundDark,
               shape: BoxShape.circle,
+              color: fillColor,
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 2,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 1),
-                ),
+                if (value != null)
+                  BoxShadow(
+                    color: fillColor.withOpacity(0.4),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
+
+
 
   Widget _buildChip(
       int row,
