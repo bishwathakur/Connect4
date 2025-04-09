@@ -9,6 +9,7 @@ part 'game_state.dart';
 class GameBloc extends Bloc<GameEvent, GameState> {
   final SupabaseClient supabase;
   final String userId;
+  late final Stream<Map<String, dynamic>> _gameUpdates;
 
   GameBloc({required this.supabase, required this.userId}) : super(GameLoading()) {
     on<GameStarted>(_onGameStarted);
@@ -17,28 +18,62 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<RematchRequested>(_onRematchRequested);
   }
 
+  @override
+  Future<void> close() {
+    _gameUpdates.drain();
+    return super.close();
+  }
+
   Future<void> _onGameStarted(GameStarted event, Emitter<GameState> emit) async {
     emit(GameLoading());
     try {
       final game = await supabase.from('games').select().eq('id', event.gameId).single();
       final isPlayer1 = game['player1_id'] == userId;
-      final board = List<List<int>>.from(game['board_state'].map((row) => List<int>.from(row)));
+      final board = game['board_state'] != null
+          ? List<List<int>>.from(game['board_state'].map((row) => List<int>.from(row)))
+          : List.generate(6, (_) => List.filled(7, 0));
       final currentTurn = game['current_turn_id'] == game['player1_id'] ? 1 : 2;
 
-      emit(GameActive(
-        board: board,
-        currentTurn: currentTurn,
-        turnCount: game['turn_count'] ?? 0,
-        isCurrentPlayerTurn: game['current_turn_id'] == userId,
-        isPlayer1: isPlayer1,
-        lastMove: game['last_move'] != null
-            ? Map<String, int>.from(game['last_move'])
-            : null,
-        player1Name: game['player1_name'] ?? 'Player 1',
-        player2Name: game['player2_name'] ?? 'Player 2',
-        player1Score: game['player1_score'] ?? 0,
-        player2Score: game['player2_score'] ?? 0,
-      ));
+      // Listen for real-time updates to the game
+      _gameUpdates = supabase.from('games').stream(primaryKey: ['id']).eq('id', event.gameId).map((maps) {
+        if (maps.isNotEmpty) {
+          return maps.first;
+        } else {
+          return {};
+        }
+      });
+
+      await emit.forEach<Map<String, dynamic>>(
+        _gameUpdates,
+        onData: (game) {
+          if (game.isEmpty) {
+            return GameError('Game not found');
+          }
+          final status = game['status'];
+          if (status == 'active') {
+            return GameActive(
+              board: board,
+              currentTurn: currentTurn,
+              turnCount: game['turn_count'] ?? 0,
+              isCurrentPlayerTurn: game['current_turn_id'] == userId,
+              isPlayer1: isPlayer1,
+              lastMove: game['last_move'] != null
+                  ? Map<String, int>.from(game['last_move'])
+                  : null,
+              player1Name: game['player1_name'] ?? 'Player 1',
+              player2Name: game['player2_name'] ?? 'Player 2',
+              player1Score: game['player1_score'] ?? 0,
+              player2Score: game['player2_score'] ?? 0,
+            );
+          } else if (status == 'matched') {
+            return GameMatched();
+          } else if (status == 'finished') {
+            return GameOver(isWinner: true, message: 'Game finished');
+          } else {
+            return GameLoading();
+          }
+        },
+      );
     } catch (e) {
       emit(GameError('Failed to start game: $e'));
     }
@@ -89,4 +124,3 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     }
   }
 }
-

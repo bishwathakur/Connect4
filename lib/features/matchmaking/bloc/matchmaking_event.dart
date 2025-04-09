@@ -31,3 +31,25 @@ class SubscribeToGameUpdates extends MatchmakingEvent {
   @override
   List<Object> get props => [gameId];
 }
+
+class GameMatched extends MatchmakingEvent {
+  final String gameId;
+
+  const GameMatched(this.gameId);
+
+  @override
+  List<Object> get props => [gameId];
+}
+
+
+// Initialize the game with the current user
+class InitializeGame extends MatchmakingEvent {
+  final String gameId;
+  const InitializeGame(this.gameId);
+
+  @override
+  List<Object> get props => [gameId];
+}
+
+
+

@@ -170,15 +170,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen> {
                       subtitle: 'Play with a friend using a room code',
                       color: AppColors.chipRed,
                       onPressed: () {
-                        final code = _roomCodeController.text.trim();
-                        debugPrint('📥 JOIN button pressed with code: $code');
-
-                        if (code.isNotEmpty) {
-                          debugPrint('📤 Dispatching JoinRoomRequested');
-                          bloc.add(JoinRoomRequested(code));
-                        } else {
-                          debugPrint('⚠️ Empty room code entered.');
-                        }
+                        bloc.add(CreatePrivateRoomRequested());
                       },
 
                     ),

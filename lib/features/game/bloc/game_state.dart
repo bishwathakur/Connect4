@@ -9,6 +9,8 @@ abstract class GameState extends Equatable {
 
 class GameLoading extends GameState {}
 
+class GameMatched extends GameState {} // New state for "matched"
+
 class GameActive extends GameState {
   final List<List<int>> board; // 0 = empty, 1 = P1, 2 = P2
   final int currentTurn;
